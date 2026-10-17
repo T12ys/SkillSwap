@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} · SkillSwap{% endblock %}
+
+{% block content %}
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">{{ title }}</h1>
+    <p class="text-gray-500">{{ subtitle }}</p>
+  </div>
+
+  {% include 'includes/offer_filters.html' %}
+
+  <p class="mb-4 text-sm text-gray-500">{{ paginator.count }} offer{{ paginator.count|pluralize }} found</p>
+
+  {% if offers %}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for offer in offers %}{% include 'includes/offer_card.html' %}{% endfor %}
+    </div>
+    {% include 'includes/pagination.html' %}
+  {% else %}
+    <div class="card text-center text-gray-500">No offers match your filters.</div>
+  {% endif %}
+{% endblock %}

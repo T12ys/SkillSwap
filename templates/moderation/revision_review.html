@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Review changes · SkillSwap{% endblock %}
+
+{% block content %}
+  <p class="mb-2 text-sm font-medium text-yellow-600">Changes to a published offer</p>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <article class="card lg:col-span-2">
+      <h1 class="text-2xl font-bold mb-1">{{ revision.offer.title }}</h1>
+      <p class="mb-6 text-sm text-gray-500">
+        by {{ revision.offer.author.username }} ·
+        <a href="{{ revision.offer.get_absolute_url }}" class="text-blue-600 hover:underline">view live version</a>
+      </p>
+
+      {% with changes=revision.changes %}
+        {% if changes %}
+          <div class="space-y-5">
+            {% for row in changes %}
+              <div>
+                <div class="mb-2 text-xs font-semibold uppercase text-gray-500">{{ row.label }}</div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div class="rounded bg-red-50 p-3 text-sm">
+                    <div class="mb-1 text-xs text-red-600">Before</div>
+                    {% if row.name == 'image' %}
+                      {% if row.old %}<img src="{{ row.old }}" alt="" class="rounded">{% else %}<span class="text-gray-400">no image</span>{% endif %}
+                    {% else %}
+                      <div class="whitespace-pre-line">{{ row.old }}</div>
+                    {% endif %}
+                  </div>
+                  <div class="rounded bg-green-50 p-3 text-sm">
+                    <div class="mb-1 text-xs text-green-600">After</div>
+                    {% if row.name == 'image' %}
+                      {% if row.new %}<img src="{{ row.new }}" alt="" class="rounded">{% else %}<span class="text-gray-400">no image</span>{% endif %}
+                    {% else %}
+                      <div class="whitespace-pre-line">{{ row.new }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-gray-500">No actual changes - the content is identical to the live version.</p>
+        {% endif %}
+      {% endwith %}
+    </article>
+
+    {% include 'moderation/_actions.html' %}
+  </div>
+{% endblock %}

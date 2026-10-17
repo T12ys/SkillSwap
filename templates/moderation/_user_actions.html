@@ -1,0 +1,33 @@
+<div class="flex flex-wrap gap-2">
+  {% if target.can_change_role %}
+    {% if target.is_admin %}
+      <form method="post" action="{% url 'moderation:user_action' target.pk 'remove_admin' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn-secondary !py-1.5">Remove admin</button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'moderation:user_action' target.pk 'make_admin' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn-secondary !py-1.5">Make admin</button>
+      </form>
+    {% endif %}
+  {% endif %}
+
+  {% if target.can_be_banned %}
+    {% if target.is_banned %}
+      <form method="post" action="{% url 'moderation:user_action' target.pk 'unban' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn-secondary !py-1.5">Unban</button>
+      </form>
+    {% else %}
+      <form method="post" action="{% url 'moderation:user_action' target.pk 'ban' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn-danger !py-1.5">Ban</button>
+      </form>
+    {% endif %}
+  {% endif %}
+</div>

@@ -1,0 +1,42 @@
+{% load rating_tags %}
+<a href="{{ offer.get_absolute_url }}" class="block overflow-hidden rounded border border-gray-200 bg-white hover:border-blue-400">
+  {% if offer.image %}
+    <img src="{{ offer.image.url }}" alt="{{ offer.title }}" class="aspect-video w-full object-cover">
+  {% else %}
+    <div class="flex aspect-video items-center justify-center bg-gray-200 text-gray-500">No image</div>
+  {% endif %}
+
+  <div class="space-y-2 p-4">
+    <div class="text-xs text-blue-600">{{ offer.category.name }}</div>
+
+    <h3 class="font-semibold">{{ offer.title }}</h3>
+
+    {% if show_status %}
+      <div class="flex flex-wrap gap-1">
+        {% include 'includes/status_badge.html' %}
+        {% if offer.pending_revision %}
+          {% if offer.pending_revision.is_pending %}
+            <span class="rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800">Changes pending</span>
+          {% else %}
+            <span class="rounded bg-red-100 px-2 py-0.5 text-xs text-red-800">Changes rejected</span>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if offer.reviews_count %}
+      <div class="text-sm">
+        {% stars offer.avg_rating %} {{ offer.avg_rating|floatformat:1 }}
+        <span class="text-gray-500">({{ offer.reviews_count }})</span>
+      </div>
+    {% endif %}
+
+    <div class="text-xs text-gray-600">
+      {{ offer.get_level_display }} · {{ offer.get_format_display }} · {{ offer.duration_display }}
+    </div>
+
+    {% if not show_status %}
+      <div class="text-sm text-gray-600">by {{ offer.author.username }}</div>
+    {% endif %}
+  </div>
+</a>

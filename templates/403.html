@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block title %}Access denied · SkillSwap{% endblock %}
+
+{% block content %}
+  {% include 'includes/error_page.html' with code='403' title='Access denied' text='You do not have permission to do this.' %}
+{% endblock %}

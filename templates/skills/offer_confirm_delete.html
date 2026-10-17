@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete offer · SkillSwap{% endblock %}
+
+{% block content %}
+  <div class="max-w-md mx-auto card">
+    <h1 class="text-xl font-bold mb-2">Delete offer?</h1>
+    <p class="text-gray-600 mb-6">“{{ offer.title }}” will be deleted permanently.</p>
+    <form method="post" class="flex gap-3">
+      {% csrf_token %}
+      <button type="submit" class="btn-danger">Delete</button>
+      <a href="{{ offer.get_absolute_url }}" class="btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

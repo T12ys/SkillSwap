@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Favorites · SkillSwap{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-6">Favorites</h1>
+
+  {% if offers %}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for offer in offers %}
+        <div class="flex flex-col gap-2">
+          {% include 'includes/offer_card.html' %}
+          <form method="post" action="{% url 'skills:favorite_toggle' offer.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="text-sm text-gray-500 hover:text-red-600">&#9829; Remove from favorites</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+    {% include 'includes/pagination.html' %}
+  {% else %}
+    <div class="card text-center text-gray-500">
+      No favorites yet. Open any offer and press <span class="text-red-500">&#9829;</span> to save it here.
+    </div>
+  {% endif %}
+{% endblock %}

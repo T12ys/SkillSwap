@@ -1,0 +1,22 @@
+<form method="get" id="offer-filters" class="card mb-6 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
+  <div class="flex gap-2 sm:col-span-2">
+    {{ filter_form.q }}
+    <button type="submit" class="btn-primary">Search</button>
+  </div>
+  {% for field in filter_form %}
+    {% if field.name != 'q' %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="sr-only">{{ field.label }}</label>
+        {{ field }}
+      </div>
+    {% endif %}
+  {% endfor %}
+  {% if request.GET %}
+    <a href="{{ request.path }}" class="text-sm text-gray-500 hover:text-blue-600 lg:col-span-6">&times; Reset filters</a>
+  {% endif %}
+</form>
+<script>
+  document.querySelectorAll('#offer-filters select').forEach(function (el) {
+    el.addEventListener('change', function () { el.form.submit(); });
+  });
+</script>

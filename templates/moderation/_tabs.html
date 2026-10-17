@@ -1,0 +1,14 @@
+{% with name=request.resolver_match.url_name %}
+  <nav class="mb-6 flex gap-2 border-b border-gray-200">
+    <a href="{% url 'moderation:queue' %}"
+       class="-mb-px border-b-2 px-4 py-2 text-sm font-medium
+         {% if name == 'users' %}border-transparent text-gray-500 hover:text-blue-600{% else %}border-blue-600 text-blue-600{% endif %}">
+      Offers queue {% if moderation_count %}<span class="ml-1 rounded-full bg-yellow-500 px-2 text-xs text-white">{{ moderation_count }}</span>{% endif %}
+    </a>
+    <a href="{% url 'moderation:users' %}"
+       class="-mb-px border-b-2 px-4 py-2 text-sm font-medium
+         {% if name == 'users' %}border-blue-600 text-blue-600{% else %}border-transparent text-gray-500 hover:text-blue-600{% endif %}">
+      Users
+    </a>
+  </nav>
+{% endwith %}

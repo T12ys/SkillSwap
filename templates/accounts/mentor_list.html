@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load rating_tags %}
+
+{% block title %}Mentors · SkillSwap{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">Mentors</h1>
+      <p class="text-gray-500">People who teach their skills on SkillSwap.</p>
+    </div>
+    <form method="get" class="flex gap-2">
+      <input type="search" name="q" value="{{ query }}" placeholder="Search by username" class="!w-64">
+      <button class="btn-secondary">Search</button>
+    </form>
+  </div>
+
+  {% if mentors %}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for mentor in mentors %}
+        <a href="{% url 'accounts:profile' mentor.username %}"
+           class="group card flex flex-col gap-4 hover:border-blue-300 hover:">
+          <div class="flex items-center gap-4">
+            {% include 'includes/avatar.html' with u=mentor size='w-14 h-14 text-xl' %}
+            <div class="min-w-0">
+              <div class="truncate font-semibold">{{ mentor.username }}</div>
+              <div class="flex items-center gap-1 text-sm">
+                {% if mentor.reviews_count %}
+                  {% stars mentor.avg_rating %}
+                  <span class="font-medium">{{ mentor.avg_rating|floatformat:1 }}</span>
+                  <span class="text-gray-500">({{ mentor.reviews_count }})</span>
+                {% else %}
+                  <span class="text-gray-400">No ratings yet</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <p class=" text-sm text-gray-600">{{ mentor.bio|default:"No description yet." }}</p>
+          <div class="mt-auto text-sm text-gray-500">
+            {{ mentor.offers_count }} published offer{{ mentor.offers_count|pluralize }}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% include 'includes/pagination.html' %}
+  {% else %}
+    <div class="card text-center text-gray-500">No mentors found.</div>
+  {% endif %}
+{% endblock %}

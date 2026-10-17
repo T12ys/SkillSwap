@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block title %}Page not found · SkillSwap{% endblock %}
+
+{% block content %}
+  {% include 'includes/error_page.html' with code='404' title='Page not found' text='The page you are looking for does not exist or is not available to you.' %}
+{% endblock %}

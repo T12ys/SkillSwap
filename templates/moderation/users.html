@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Users · Moderation · SkillSwap{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Moderation</h1>
+  {% include 'moderation/_tabs.html' %}
+
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <nav class="flex gap-2">
+      <a href="?" class="rounded-full px-4 py-1.5 text-sm font-medium {% if not current_filter %}bg-blue-600 text-white{% else %}border border-gray-200 bg-white text-gray-600{% endif %}">All</a>
+      <a href="?filter=admins" class="rounded-full px-4 py-1.5 text-sm font-medium {% if current_filter == 'admins' %}bg-blue-600 text-white{% else %}border border-gray-200 bg-white text-gray-600{% endif %}">Admins</a>
+      <a href="?filter=banned" class="rounded-full px-4 py-1.5 text-sm font-medium {% if current_filter == 'banned' %}bg-blue-600 text-white{% else %}border border-gray-200 bg-white text-gray-600{% endif %}">Banned</a>
+    </nav>
+    <form method="get" class="flex gap-2">
+      {% if current_filter %}<input type="hidden" name="filter" value="{{ current_filter }}">{% endif %}
+      <input type="search" name="q" value="{{ query }}" placeholder="Username or email" class="!w-64">
+      <button class="btn-secondary">Search</button>
+    </form>
+  </div>
+
+  <div class="card overflow-x-auto p-0">
+    <table class="w-full text-sm">
+      <thead class="border-b border-gray-200 text-left text-xs uppercase text-gray-500">
+        <tr>
+          <th class="px-6 py-3">User</th>
+          <th class="px-6 py-3">Role</th>
+          <th class="px-6 py-3">Published offers</th>
+          <th class="px-6 py-3">Joined</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for target in users %}
+          <tr>
+            <td class="px-6 py-3">
+              <a href="{% url 'accounts:profile' target.username %}" class="flex items-center gap-3 hover:text-blue-600">
+                {% include 'includes/avatar.html' with u=target size='w-8 h-8 text-sm' %}
+                <div>
+                  <div class="font-medium">{{ target.username }}{% if target == user %} <span class="text-gray-400">(you)</span>{% endif %}</div>
+                  <div class="text-xs text-gray-500">{{ target.email }}</div>
+                </div>
+              </a>
+            </td>
+            <td class="px-6 py-3">
+              {% if target.is_super_admin %}<span class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">Super admin</span>
+              {% elif target.is_admin %}<span class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">Admin</span>
+              {% else %}<span class="text-gray-500">User</span>{% endif %}
+              {% if target.is_banned %}<span class="ml-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">Banned</span>{% endif %}
+            </td>
+            <td class="px-6 py-3">{{ target.offers_count }}</td>
+            <td class="px-6 py-3 text-gray-500">{{ target.date_joined|date:"d M Y" }}</td>
+            <td class="px-6 py-3">{% include 'moderation/_user_actions.html' %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No users found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'includes/pagination.html' %}
+{% endblock %}

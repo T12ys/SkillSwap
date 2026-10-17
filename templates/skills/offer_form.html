@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if offer %}Edit offer{% else %}New offer{% endif %} · SkillSwap{% endblock %}
+
+{% block content %}
+  <div class="max-w-2xl mx-auto card">
+    <h1 class="text-2xl font-bold mb-1">{% if offer %}Edit offer{% else %}New skill offer{% endif %}</h1>
+    <p class="mb-6 text-sm text-gray-500">
+      {% if is_revision %}
+        This offer is published. Your changes will be visible after admin approval;
+        until then everyone sees the current version.
+      {% else %}
+        New offers are published only after admin approval.
+      {% endif %}
+    </p>
+
+    {% if is_revision and form.instance.status == 'rejected' %}
+      {% include 'skills/_rejected_note.html' with reason=form.instance.rejection_reason title='Your previous changes were rejected' %}
+    {% elif not is_revision and offer.status == 'rejected' %}
+      {% include 'skills/_rejected_note.html' with reason=offer.rejection_reason title='This offer was rejected' %}
+    {% endif %}
+
+    {% if form.instance.image %}
+      <img src="{{ form.instance.image.url }}" alt="" class="mb-6 aspect-video w-full rounded object-cover">
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4" novalidate>
+      {% csrf_token %}
+      {% include 'includes/form_fields.html' %}
+
+      <div class="flex flex-wrap gap-3 pt-2">
+        {% if is_revision %}
+          <button type="submit" class="btn-primary">Submit changes for review</button>
+        {% elif offer.is_published %}
+          <button type="submit" class="btn-primary">Save changes</button>
+        {% elif not offer or offer.author == user %}
+          <button type="submit" name="action" value="submit" class="btn-primary">Submit for review</button>
+          <button type="submit" name="action" value="draft" class="btn-secondary">Save as draft</button>
+        {% else %}
+          <button type="submit" class="btn-primary">Save changes</button>
+        {% endif %}
+        <a href="{% if offer %}{{ offer.get_absolute_url }}{% else %}{% url 'skills:my_offers' %}{% endif %}"
+           class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

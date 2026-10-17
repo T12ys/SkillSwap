@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Request a lesson · SkillSwap{% endblock %}
+
+{% block content %}
+  <div class="max-w-xl mx-auto card">
+    <h1 class="text-2xl font-bold mb-1">Request a lesson</h1>
+    <p class="mb-6 text-sm text-gray-500">
+      <a href="{{ offer.get_absolute_url }}" class="text-blue-600 hover:underline">{{ offer.title }}</a>
+      · {{ offer.duration_display }} · {{ offer.get_format_display }} · mentor {{ offer.author.username }}
+    </p>
+    <form method="post" class="space-y-4" novalidate>
+      {% csrf_token %}
+      {% include 'includes/form_fields.html' %}
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary">Send request</button>
+        <a href="{{ offer.get_absolute_url }}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

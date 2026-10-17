@@ -1,0 +1,7 @@
+{% if u.avatar %}
+  <img src="{{ u.avatar.url }}" alt="{{ u.username }}" class="{{ size|default:'w-10 h-10' }} rounded-full object-cover">
+{% else %}
+  <div class="{{ size|default:'w-10 h-10' }} flex items-center justify-center rounded-full bg-gray-300 font-semibold uppercase text-gray-700">
+    {{ u.username|first }}
+  </div>
+{% endif %}

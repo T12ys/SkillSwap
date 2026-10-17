@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Review: {{ offer.title }} · SkillSwap{% endblock %}
+
+{% block content %}
+  <p class="mb-2 text-sm font-medium text-yellow-600">New offer waiting for review</p>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <article class="card space-y-4 lg:col-span-2">
+      <h1 class="text-2xl font-bold">{{ offer.title }}</h1>
+      <a href="{% url 'accounts:profile' offer.author.username %}" class="flex items-center gap-2 text-sm text-gray-600">
+        {% include 'includes/avatar.html' with u=offer.author size='w-6 h-6 text-xs' %} {{ offer.author.username }}
+      </a>
+      <dl class="grid grid-cols-2 gap-4 sm:grid-cols-4 text-sm">
+        <div><dt class="text-xs uppercase text-gray-500">Category</dt><dd>{{ offer.category.name }}</dd></div>
+        <div><dt class="text-xs uppercase text-gray-500">Level</dt><dd>{{ offer.get_level_display }}</dd></div>
+        <div><dt class="text-xs uppercase text-gray-500">Format</dt><dd>{{ offer.get_format_display }}</dd></div>
+        <div><dt class="text-xs uppercase text-gray-500">Duration</dt><dd>{{ offer.duration_display }}</dd></div>
+      </dl>
+      {% if offer.image %}
+        <img src="{{ offer.image.url }}" alt="" class="aspect-video w-full rounded object-cover">
+      {% endif %}
+      <p class="whitespace-pre-line text-gray-700">{{ offer.description }}</p>
+    </article>
+
+    {% include 'moderation/_actions.html' %}
+  </div>
+{% endblock %}

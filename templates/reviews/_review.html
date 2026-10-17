@@ -1,0 +1,25 @@
+{% load rating_tags %}
+<div class="py-4">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      {% include 'includes/avatar.html' with u=review.author size='w-8 h-8 text-sm' %}
+      <a href="{% url 'accounts:profile' review.author.username %}" class="font-medium hover:text-blue-600">{{ review.author.username }}</a>
+      {% stars review.rating %}
+    </div>
+    <div class="flex items-center gap-3 text-xs text-gray-500">
+      {{ review.created_at|date:"d M Y" }}
+      {% if review.author == user %}
+        <a href="{% url 'reviews:edit' review.pk %}" class="text-blue-600 hover:underline">Edit</a>
+      {% endif %}
+      {% if review.author == user or user.is_admin %}
+        <a href="{% url 'reviews:delete' review.pk %}" class="text-red-600 hover:underline">Delete</a>
+      {% endif %}
+    </div>
+  </div>
+  {% if show_offer %}
+    <a href="{{ review.offer.get_absolute_url }}" class="mt-1 block text-xs text-blue-600 hover:underline">{{ review.offer.title }}</a>
+  {% endif %}
+  {% if review.text %}
+    <p class="mt-2 whitespace-pre-line text-sm text-gray-700">{{ review.text }}</p>
+  {% endif %}
+</div>

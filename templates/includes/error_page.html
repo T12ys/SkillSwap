@@ -1,0 +1,9 @@
+<div class="mx-auto max-w-lg py-16 text-center">
+  <div class="text-7xl font-extrabold text-blue-600">{{ code }}</div>
+  <h1 class="mt-4 text-2xl font-bold">{{ title }}</h1>
+  <p class="mt-2 text-gray-600">{{ text }}</p>
+  <div class="mt-8 flex justify-center gap-3">
+    <a href="{% url 'home' %}" class="btn-primary">Go to homepage</a>
+    <a href="{% url 'skills:explore' %}" class="btn-secondary">Explore offers</a>
+  </div>
+</div>

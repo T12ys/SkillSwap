@@ -1,0 +1,14 @@
+<aside class="card space-y-6">
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="approve" class="btn-primary w-full">Approve and publish</button>
+  </form>
+
+  <form method="post" class="space-y-3 border-t border-gray-100 pt-6">
+    {% csrf_token %}
+    {% include 'includes/form_fields.html' with form=reject_form %}
+    <button type="submit" name="action" value="reject" class="btn-danger w-full">Reject</button>
+  </form>
+
+  <a href="{% url 'moderation:queue' %}" class="block text-center text-sm text-gray-500 hover:text-blue-600">&larr; Back to queue</a>
+</aside>

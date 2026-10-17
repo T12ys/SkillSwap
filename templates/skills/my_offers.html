@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}My offers · SkillSwap{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold">My offers</h1>
+    <a href="{% url 'skills:offer_create' %}" class="btn-primary">+ New offer</a>
+  </div>
+
+  <nav class="mb-6 flex flex-wrap gap-2">
+    {% for value, label, count in tabs %}
+      <a href="?status={{ value }}"
+         class="rounded-full px-4 py-1.5 text-sm font-medium
+           {% if value == current_status %}bg-blue-600 text-white{% else %}bg-white border border-gray-200 text-gray-600 hover:bg-gray-50{% endif %}">
+        {{ label }} <span class="opacity-70">{{ count }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if offers %}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for offer in offers %}
+        {% include 'includes/offer_card.html' with show_status=True %}
+      {% endfor %}
+    </div>
+    {% include 'includes/pagination.html' %}
+  {% else %}
+    <div class="card text-center text-gray-500">
+      No offers here yet.
+      <a href="{% url 'skills:offer_create' %}" class="text-blue-600 hover:underline">Create your first offer</a>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="mb-10 text-center">
+    <h1 class="text-3xl font-bold">Learn anything. Teach what you know.</h1>
+    <p class="mt-2 text-gray-600">SkillSwap connects people who want to share skills.</p>
+
+    <form method="get" action="{% url 'skills:explore' %}" class="mx-auto mt-6 flex max-w-xl gap-2">
+      <input type="search" name="q" placeholder="What do you want to learn?">
+      <button class="btn-primary">Search</button>
+    </form>
+  </section>
+
+  <section class="mb-10">
+    <h2 class="mb-3 text-xl font-bold">Categories</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {% for category in categories %}
+        {% include 'includes/category_tile.html' %}
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if popular_offers %}
+    <section class="mb-10">
+      <h2 class="mb-3 text-xl font-bold">
+        Popular <a href="{% url 'skills:popular' %}" class="text-sm font-normal text-blue-600">see all</a>
+      </h2>
+      <div class="grid gap-4 sm:grid-cols-3">
+        {% for offer in popular_offers %}
+          {% include 'includes/offer_card.html' %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section>
+    <h2 class="mb-3 text-xl font-bold">
+      New offers <a href="{% url 'skills:explore' %}" class="text-sm font-normal text-blue-600">see all</a>
+    </h2>
+    {% if latest_offers %}
+      <div class="grid gap-4 sm:grid-cols-3">
+        {% for offer in latest_offers %}
+          {% include 'includes/offer_card.html' %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card text-center text-gray-500">No offers yet.</div>
+    {% endif %}
+  </section>
+{% endblock %}

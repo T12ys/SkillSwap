@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load rating_tags %}
+
+{% block title %}{{ offer.title }} · SkillSwap{% endblock %}
+
+{% block content %}
+  {% if offer.author == user %}
+    {% if offer.status == 'pending' %}
+      <div class="mb-6 rounded bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
+        This offer is waiting for admin approval. Only you and admins can see it.
+      </div>
+    {% elif offer.status == 'rejected' %}
+      {% include 'skills/_rejected_note.html' with reason=offer.rejection_reason title='This offer was rejected' %}
+    {% elif offer.status == 'draft' %}
+      <div class="mb-6 rounded bg-gray-100 px-4 py-3 text-sm text-gray-600">
+        This is a draft. Submit it for review when it is ready.
+      </div>
+    {% endif %}
+
+    {% with revision=offer.pending_revision %}
+      {% if revision %}
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded px-4 py-3 text-sm
+          {% if revision.is_pending %}bg-yellow-50 text-yellow-700{% else %}bg-red-50 text-red-700{% endif %}">
+          <div>
+            {% if revision.is_pending %}
+              Your changes are waiting for admin approval. Everyone sees the current version until then.
+            {% else %}
+              <div class="font-semibold">Your changes were rejected</div>
+              <p class="whitespace-pre-line">{{ revision.rejection_reason }}</p>
+            {% endif %}
+          </div>
+          <div class="flex gap-2">
+            <a href="{% url 'skills:offer_revise' offer.pk %}" class="btn-secondary">Edit changes</a>
+            <form method="post" action="{% url 'skills:revision_discard' offer.pk %}">
+              {% csrf_token %}
+              <button class="btn-secondary">Discard</button>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  {% elif user.is_admin and offer.status == 'pending' %}
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
+      This offer is waiting for moderation.
+      <a href="{% url 'moderation:offer' offer.pk %}" class="btn-primary">Review it</a>
+    </div>
+  {% endif %}
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <article class="space-y-6 lg:col-span-2">
+      <header class="card">
+        <div class="flex flex-wrap items-center gap-2">
+          <a href="{{ offer.category.get_absolute_url }}" class="text-sm font-medium text-blue-600 hover:underline">{{ offer.category.name }}</a>
+          {% if not offer.is_published %}{% include 'includes/status_badge.html' %}{% endif %}
+        </div>
+        <h1 class="mt-2 text-3xl font-bold">{{ offer.title }}</h1>
+
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+          <a href="{% url 'accounts:profile' offer.author.username %}" class="group flex items-center gap-3">
+            {% include 'includes/avatar.html' with u=offer.author size='w-10 h-10' %}
+            <div>
+              <div class="font-medium">{{ offer.author.username }}</div>
+              <div class="text-xs text-gray-500">Posted {{ offer.created_at|date:"d M Y, H:i" }}</div>
+            </div>
+          </a>
+
+          <div class="flex flex-wrap gap-2">
+            {% if offer.is_published %}
+              {% if user.is_authenticated %}
+                <form method="post" action="{% url 'skills:favorite_toggle' offer.pk %}">
+                  {% csrf_token %}
+                  <button class="btn-secondary {% if is_favorite %}!text-red-600{% endif %}"
+                          title="{% if is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}">
+                    {% if is_favorite %}&#9829; Saved{% else %}&#9825; Save{% endif %}
+                  </button>
+                </form>
+              {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn-secondary">&#9825; Save</a>
+              {% endif %}
+            {% endif %}
+            {% if offer.author == user or user.is_admin %}
+              {% if offer.author == user and offer.can_submit %}
+                <form method="post" action="{% url 'skills:offer_submit' offer.pk %}">
+                  {% csrf_token %}
+                  <button class="btn-primary">Submit for review</button>
+                </form>
+              {% endif %}
+              <a href="{% url 'skills:offer_edit' offer.pk %}" class="btn-secondary">Edit</a>
+              <a href="{% url 'skills:offer_delete' offer.pk %}" class="btn-danger">Delete</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <dl class="mt-6 grid grid-cols-2 gap-4 border-t border-gray-100 pt-6 sm:grid-cols-3">
+          <div>
+            <dt class="text-xs uppercase text-gray-500">Rating</dt>
+            <dd class="flex items-center gap-1.5 font-medium">
+              {% if offer.reviews_count %}
+                {% stars offer.avg_rating %} {{ offer.avg_rating|floatformat:1 }}
+                <span class="text-sm font-normal text-gray-500">({{ offer.reviews_count }} rating{{ offer.reviews_count|pluralize }})</span>
+              {% else %}
+                <span class="text-gray-400">No ratings yet</span>
+              {% endif %}
+            </dd>
+          </div>
+          <div><dt class="text-xs uppercase text-gray-500">Completed lessons</dt><dd class="font-medium">{{ completed_lessons }}</dd></div>
+          <div><dt class="text-xs uppercase text-gray-500">Category</dt><dd class="font-medium">{{ offer.category.name }}</dd></div>
+          <div><dt class="text-xs uppercase text-gray-500">Level</dt><dd class="font-medium">{{ offer.get_level_display }}</dd></div>
+          <div><dt class="text-xs uppercase text-gray-500">Format</dt><dd class="font-medium">{{ offer.get_format_display }}</dd></div>
+          <div><dt class="text-xs uppercase text-gray-500">Duration</dt><dd class="font-medium">{{ offer.duration_display }}</dd></div>
+        </dl>
+      </header>
+
+      {% if offer.image %}
+        <img src="{{ offer.image.url }}" alt="{{ offer.title }}" class="aspect-video w-full rounded object-cover">
+      {% endif %}
+
+      <section class="card">
+        <h2 class="text-lg font-semibold mb-3">About this skill</h2>
+        <p class="whitespace-pre-line text-gray-700">{{ offer.description }}</p>
+      </section>
+
+      <section id="reviews" class="card">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold">Reviews <span class="text-gray-400">{{ offer.reviews_count }}</span></h2>
+          {% if reviewable_request %}
+            <a href="{% url 'reviews:create' reviewable_request.pk %}" class="btn-primary">Leave a review</a>
+          {% endif %}
+        </div>
+        {% if reviews %}
+          <div class="divide-y divide-gray-100">
+            {% for review in reviews %}{% include 'reviews/_review.html' %}{% endfor %}
+          </div>
+        {% else %}
+          <p class="mt-3 text-gray-500">No reviews yet. Reviews can be left after a completed lesson.</p>
+        {% endif %}
+      </section>
+    </article>
+
+    <aside class="space-y-6">
+      {% if offer.is_published and offer.author != user %}
+        <section class="card space-y-4">
+          <div>
+            <div class="text-lg font-semibold">Want to learn this skill?</div>
+            <p class="text-sm text-gray-500">{{ offer.duration_display }} · {{ offer.get_format_display }} · {{ offer.get_level_display }}</p>
+          </div>
+          {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn-primary w-full">Log in to request a lesson</a>
+          {% elif active_request %}
+            <p class="rounded bg-gray-50 px-3 py-2 text-sm text-gray-600">
+              You already sent a request: <span class="font-medium">{{ active_request.get_status_display }}</span>
+            </p>
+            <a href="{% url 'bookings:my_requests' %}?box=outgoing" class="btn-secondary w-full">My requests</a>
+          {% elif user.is_banned %}
+            <p class="rounded bg-red-50 px-3 py-2 text-sm text-red-600">Your account is banned - you cannot request lessons.</p>
+          {% else %}
+            <a href="{% url 'bookings:request_create' offer.pk %}" class="btn-primary w-full">Request a lesson</a>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      <section class="card">
+        <div class="mb-3 text-xs font-semibold uppercase text-gray-500">About the mentor</div>
+        <a href="{% url 'accounts:profile' offer.author.username %}" class="group flex items-center gap-3">
+          {% include 'includes/avatar.html' with u=offer.author size='w-14 h-14 text-xl' %}
+          <span class="font-semibold">{{ offer.author.username }}</span>
+        </a>
+        <p class="mt-3 text-sm text-gray-600">{{ offer.author.bio|default:"No description yet." }}</p>
+        <a href="{% url 'accounts:profile' offer.author.username %}" class="mt-3 inline-block text-sm text-blue-600 hover:underline">View profile &rarr;</a>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

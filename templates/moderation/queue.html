@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Moderation · SkillSwap{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Moderation</h1>
+  {% include 'moderation/_tabs.html' %}
+
+  <section class="mb-10">
+    <h2 class="text-lg font-semibold mb-3">New offers <span class="text-gray-400">{{ pending_offers|length }}</span></h2>
+    {% if pending_offers %}
+      <div class="card divide-y divide-gray-100 p-0">
+        {% for offer in pending_offers %}
+          <a href="{% url 'moderation:offer' offer.pk %}" class="flex items-center justify-between gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="min-w-0">
+              <div class="font-medium truncate">{{ offer.title }}</div>
+              <div class="text-sm text-gray-500">{{ offer.category.name }} · by {{ offer.author.username }}</div>
+            </div>
+            <span class="shrink-0 text-xs text-gray-500">sent {{ offer.updated_at|timesince }} ago</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-500">Nothing to review.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold mb-3">Changes to published offers <span class="text-gray-400">{{ pending_revisions|length }}</span></h2>
+    {% if pending_revisions %}
+      <div class="card divide-y divide-gray-100 p-0">
+        {% for revision in pending_revisions %}
+          <a href="{% url 'moderation:revision' revision.pk %}" class="flex items-center justify-between gap-4 px-6 py-4 hover:bg-gray-50">
+            <div class="min-w-0">
+              <div class="font-medium truncate">{{ revision.offer.title }}</div>
+              <div class="text-sm text-gray-500">by {{ revision.offer.author.username }}</div>
+            </div>
+            <span class="shrink-0 text-xs text-gray-500">sent {{ revision.updated_at|timesince }} ago</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-500">Nothing to review.</p>
+    {% endif %}
+  </section>
+{% endblock %}

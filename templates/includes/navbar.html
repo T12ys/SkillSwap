@@ -1,0 +1,51 @@
+<header class="border-b border-gray-200 bg-white">
+  <div class="max-w-6xl mx-auto px-4">
+
+    <div class="flex flex-wrap items-center justify-between gap-3 py-3">
+      <a href="{% url 'home' %}" class="text-xl font-bold text-blue-600">SkillSwap</a>
+
+      <div class="flex flex-wrap items-center gap-4">
+        {% if user.is_authenticated %}
+          {% if user.is_admin %}
+            <a href="{% url 'moderation:queue' %}" class="nav-link">
+              Moderation{% if moderation_count %} ({{ moderation_count }}){% endif %}
+            </a>
+            <a href="{% url 'moderation:users' %}" class="nav-link">Users</a>
+          {% endif %}
+          {% if user.is_superuser %}
+            <a href="{% url 'admin:index' %}" class="nav-link">Django admin</a>
+          {% endif %}
+          {% if not user.is_banned %}
+            <a href="{% url 'skills:offer_create' %}" class="btn-primary">+ New offer</a>
+          {% endif %}
+          <a href="{% url 'accounts:profile' user.username %}" class="flex items-center gap-2 nav-link">
+            {% include 'includes/avatar.html' with u=user size='w-8 h-8' %}
+            {{ user.username }}
+          </a>
+          <form method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="nav-link">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="nav-link">Login</a>
+          <a href="{% url 'accounts:register' %}" class="btn-primary">Sign up</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <nav class="flex flex-wrap gap-5 border-t border-gray-100 py-2">
+      <a href="{% url 'skills:explore' %}" class="nav-link">Explore</a>
+      <a href="{% url 'skills:popular' %}" class="nav-link">Popular</a>
+      <a href="{% url 'skills:categories' %}" class="nav-link">Categories</a>
+      <a href="{% url 'accounts:mentors' %}" class="nav-link">Mentors</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'skills:favorites' %}" class="nav-link">Favorites</a>
+        <a href="{% url 'skills:my_offers' %}" class="nav-link">My Offers</a>
+        <a href="{% url 'bookings:my_requests' %}" class="nav-link">
+          My Requests{% if incoming_requests_count %} ({{ incoming_requests_count }}){% endif %}
+        </a>
+      {% endif %}
+    </nav>
+
+  </div>
+</header>
